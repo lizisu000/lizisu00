@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>校园网络安全小课堂</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif; background:#f4f6f9; color:#1f2937; line-height:1.6; }
+  .page { display:none; max-width:640px; margin:0 auto; padding:20px; }
+  .page.active { display:block; }
+  header { text-align:center; padding:30px 10px 20px; }
+  h1 { font-size:22px; color:#0f3d6e; }
+  .sub { color:#6b7280; font-size:14px; margin-top:6px; }
+  .card { background:#fff; border-radius:12px; padding:16px; margin-bottom:14px; box-shadow:0 2px 8px rgba(0,0,0,.06); }
+  .btn { display:block; width:100%; padding:14px; background:#0f3d6e; color:#fff; border:none; border-radius:10px; font-size:16px; cursor:pointer; margin-top:10px; }
+  .msg { border-left:4px solid #cbd5e1; padding:10px 12px; margin-bottom:10px; background:#f8fafc; border-radius:6px; cursor:pointer; }
+  .msg.right { border-left-color:#16a34a; background:#f0fdf4; }
+  .msg.wrong { border-left-color:#dc2626; background:#fef2f2; }
+  .msg .tag { font-size:12px; font-weight:bold; margin-bottom:4px; color:#64748b; }
+  .explain { font-size:13px; color:#475569; margin-top:6px; display:none; }
+  .msg.revealed .explain { display:block; }
+  .strength-bar { height:8px; background:#e5e7eb; border-radius:4px; margin:10px 0; overflow:hidden; }
+  .strength-fill { height:100%; width:0; transition:width .2s, background .2s; }
+  .check-item { display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid #f1f5f9; font-size:14px; }
+  .check-item input { width:18px; height:18px; }
+  .score { font-size:32px; font-weight:bold; color:#0f3d6e; text-align:center; margin:6px 0; }
+  .footnote { font-size:12px; color:#94a3b8; margin-top:16px; line-height:1.6; }
+  .back { display:inline-block; margin-bottom:12px; color:#0f3d6e; cursor:pointer; font-size:14px; }
+</style>
+</head>
+<body>
+
+<!-- 首页 -->
+<section id="home" class="page active">
+  <header>
+    <h1>校园网络安全小课堂</h1>
+    <p class="sub">三个小练习，学会保护自己的数据和账号</p >
+  </header>
+  <div class="card">
+    <p style="font-size:14px;color:#475569;">本作品不收集任何真实个人信息，所有题目与数据均为模拟。输入内容仅在本机计算，不上传服务器。</p >
+  </div>
+  <button class="btn" onclick="show('phishing')">1. 钓鱼链接找茬</button>
+  <button class="btn" onclick="show('password')">2. 密码强度判断</button>
+  <button class="btn" onclick="show('backup')">3. 数据备份清单</button>
+  <p class="footnote">理论对接：总体国家安全观 · 网络强国 · 数据安全</p >
+</section>
+
+<!-- 钓鱼链接 -->
+<section id="phishing" class="page">
+  <span class="back" onclick="show('home')">← 返回首页</span>
+  <h2 style="font-size:18px;margin-bottom:12px;">找出可疑消息</h2>
+  <p style="font-size:14px;color:#475569;margin-bottom:14px;">下面5条模拟消息中，有几条是诈骗或钓鱼信息。点击你认为可疑的那一条，会显示判断理由。</p >
+  <div id="msgList"></div>
+  <div class="footnote">可疑信号包括：陌生链接、制造紧迫感、索要验证码或银行卡、要求转账、刷单兼职等。依据《个人信息保护法》第十三条，处理个人信息应取得个人同意；遇到索要个人信息的陌生消息，应提高警惕。</div>
+</section>
+
+<!-- 密码强度 -->
+<section id="password" class="page">
+  <span class="back" onclick="show('home')">← 返回首页</span>
+  <h2 style="font-size:18px;margin-bottom:12px;">密码强度实时判断</h2>
+  <p style="font-size:14px;color:#475569;margin-bottom:14px;">在下方输入任意字符串，页面会实时判断强度。<strong>输入内容不会上传，仅在本机计算。</strong></p >
+  <div class="card">
+    <input id="pwdInput" type="text" placeholder="输入试试，例如：abc123" style="width:100%;padding:12px;border:1px solid #cbd5e1;border-radius:8px;font-size:16px;" autocomplete="off">
+    <div class="strength-bar"><div id="strengthFill" class="strength-fill"></div></div>
+    <p id="strengthText" style="font-size:14px;color:#475569;">等待输入…</p >
+    <ul id="tips" style="font-size:13px;color:#64748b;margin-top:10px;padding-left:18px;"></ul>
+  </div>
+  <div class="footnote">依据《数据安全法》第二十七条，数据处理者应建立健全全流程数据安全管理制度。个人设置强密码、不重复使用密码，是保护账号安全的第一道防线。</div>
+</section>
+
+<!-- 备份清单 -->
+<section id="backup" class="page">
+  <span class="back" onclick="show('home')">← 返回首页</span>
+  <h2 style="font-size:18px;margin-bottom:12px;">数据备份一分钟检查</h2>
+  <p style="font-size:14px;color:#475569;margin-bottom:14px;">勾选你目前做到的项目，看看自己的备份习惯得几分。</p >
+  <div class="card" id="checkList">
+    <label class="check-item"><input type="checkbox" data-score="25"> 重要文件有备份（论文、作业、照片等）</label>
+    <label class="check-item"><input type="checkbox" data-score="25"> 备份放在异地或云端，不只存一份在本地</label>
+    <label class="check-item"><input type="checkbox" data-score="25"> 验证过备份文件能够正常恢复</label>
+    <label class="check-item"><input type="checkbox" data-score="25"> 重要账号开启了双重验证（短信/验证器）</label>
+  </div>
+  <div class="card">
+    <p style="font-size:14px;color:#475569;text-align:center;">当前得分</p >
+    <div id="score" class="score">0</div>
+    <p id="scoreTip" style="font-size:13px;color:#64748b;text-align:center;">勾选左侧项目开始评分</p >
+  </div>
+  <div class="footnote">依据《网络安全法》（2025年修订，2026年1月1日施行）关于网络运营者安全保护义务的规定，以及《数据安全法》第二十七条，数据备份与恢复能力是数据安全的基本要求。个人同样应养成备份习惯。</div>
+</section>
+
+<script>
+function show(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+// ---------- 钓鱼链接 ----------
+const messages = [
+  { text:'【教务处】您的奖学金已到账，请点击链接填写银行卡号领取：http://example.com/scholarship', bad:true, reason:'陌生链接 + 索要银行卡号。学校不会通过短信链接索要银行卡信息。' },
+  { text:'明天上午8点在综合楼301开班会，请准时参加。', bad:false, reason:'普通通知，没有链接、没有索要信息，属于正常消息。' },
+  { text:'【校园卡中心】检测到您的校园卡异常，请点击 http://example.com/verify 验证身份，否则24小时内冻结。', bad:true, reason:'制造紧迫感 + 陌生链接。校园卡问题应通过官方渠道核实。' },
+  { text:'图书馆提醒：您借阅的《云计算导论》将于3天后到期，请及时归还或续借。', bad:false, reason:'正常借阅提醒，没有可疑链接和索要信息。' },
+  { text:'兼职刷单，日入300元，加QQ：12345678 了解详情。', bad:true, reason:'刷单本身违法，高额回报是典型诈骗话术，不要添加陌生联系方式。' }
+];
+const msgList = document.getElementById('msgList');
+messages.forEach((m, i) => {
+  const div = document.createElement('div');
+  div.className = 'msg';
+  div.innerHTML = `<div class="tag">消息 ${i+1}</div><div>${m.text}</div><div class="explain">${m.reason}</div>`;
+  div.onclick = function() {
+    if (div.classList.contains('revealed')) return;
+    div.classList.add('revealed');
+    div.classList.add(m.bad ? 'wrong' : 'right');
+    div.querySelector('.tag').textContent = m.bad ? `消息 ${i+1} · 可疑` : `消息 ${i+1} · 正常`;
+  };
+  msgList.appendChild(div);
+});
+// ---------- 密码强度 ----------
+const pwdInput = document.getElementById('pwdInput');
+const fill = document.getElementById('strengthFill');
+const text = document.getElementById('strengthText');
+const tips = document.getElementById('tips');
+pwdInput.addEventListener('input', function() {
+  const v = this.value;
+  if (!v) {
+    fill.style.width = '0'; fill.style.background = '#e5e7eb';
+    text.textContent = '等待输入…'; tips.innerHTML = ''; return;
+  }
+  let score = 0; const checks = [];
+  if (v.length >= 8) { score++; checks.push('长度达到8位以上'); } else { checks.push('长度不足8位'); }
+  if (/[a-z]/.test(v)) { score++; checks.push('包含小写字母'); } else { checks.push('缺少小写字母'); }
+  if (/[A-Z]/.test(v)) { score++; checks.push('包含大写字母'); } else { checks.push('缺少大写字母'); }
+  if (/[0-9]/.test(v)) { score++; checks.push('包含数字'); } else { checks.push('缺少数字'); }
+  if (/[^a-zA-Z0-9]/.test(v)) { score++; checks.push('包含特殊字符'); } else { checks.push('缺少特殊字符'); }
+  const pct = score / 5 * 100;
+  fill.style.width = pct + '%';
+  let label, color;
+  if (score <= 2) { label='弱'; color='#dc2626'; }
+  else if (score <= 4) { label='中'; color='#f59e0b'; }
+  else { label='强'; color='#16a34a'; }
+  fill.style.background = color;
+  text.textContent = `强度：${label}（满足 ${score}/5 项）`;
+  tips.innerHTML = checks.map(c => `<li>${c}</li>`).join('');
+});
+
+// ---------- 备份清单 ----------
+const checks = document.querySelectorAll('#checkList input');
+const scoreEl = document.getElementById('score');
+const scoreTip = document.getElementById('scoreTip');
+function updateScore() {
+  let total = 0;
+  checks.forEach(c => { if (c.checked) total += Number(c.dataset.score); });
+  scoreEl.textContent = total;
+  if (total === 0) scoreTip.textContent = '勾选左侧项目开始评分';
+  else if (total < 50) scoreTip.textContent = '备份习惯有待加强，建议至少做到云端备份 + 定期验证。';
+  else if (total < 100) scoreTip.textContent = '不错的开始，继续补齐剩余项目。';
+  else scoreTip.textContent = '满分！你的数据安全意识很强。';
+}
+checks.forEach(c => c.addEventListener('change', updateScore));
+updateScore();
+</script>
+</body>
+</html>
